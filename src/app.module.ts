@@ -1,3 +1,4 @@
+import { TaskModule } from './tasks/task.module';
 import { PermissionModule } from './permissions/permission.module';
 import { RoleModule } from './roles/role.module';
 import { UserModule } from './users/user.module';
@@ -8,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    TaskModule,
     PermissionModule,
     RoleModule,
     UserModule,

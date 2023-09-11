@@ -1,5 +1,3 @@
-// src/roles/models/permission.entity.ts
-
 import { Role } from 'src/roles/models/role.entity';
 import {
   Entity,

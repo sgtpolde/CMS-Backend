@@ -20,4 +20,20 @@ export class UserService extends AbstractService {
   ) {
     super(userRepository);
   }
+
+  async fetchUserRoles(userId: number): Promise<string[]> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['roles'], // Load the user's roles
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Extract role names from the user's roles
+    const roleNames = user.roles.map((role) => role.name);
+
+    return roleNames;
+  }
 }

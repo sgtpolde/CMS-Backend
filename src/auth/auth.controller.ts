@@ -18,6 +18,7 @@ import { Get, Req, UseGuards } from '@nestjs/common/decorators';
 import { AuthGuard } from './auth.guard';
 import { UseInterceptors } from '@nestjs/common/decorators/core/use-interceptors.decorator';
 import { AuthService } from './auth.service';
+import { RoleService } from 'src/roles/role.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('auth')
@@ -27,24 +28,38 @@ export class AuthController {
     private userService: UserService,
     private jwtService: JwtService,
     private authService: AuthService,
+    private roleService: RoleService,
   ) {}
 
-  //Register Controller (/signup)
   @Post('register')
   async register(@Body() body: RegisterDto) {
-    //Check if passwords match
+    // Check if passwords match
     if (body.password !== body.password_confirm) {
       throw new BadRequestException('Passwords do not match!');
     }
+
     // Hash password
     const hashed = await bcrypt.hash(body.password, 12);
-    //Register user
+
+    const roleName = body.roles || 'employee';;
+    // Fetch the default 'employee' role from the database
+    const selectedRole = await this.roleService.findOne({
+      where: { name: roleName },
+    });
+
+    console.log(selectedRole);
+    // Check if the default role exists
+    if (!selectedRole) {
+      throw new NotFoundException('Default role not found');
+    }
+
+    // Create the user with the default role assigned
     return this.userService.create({
       firstName: body.firstName,
       lastName: body.lastName,
       email: body.email,
       password: hashed,
-      roles: body.roles,
+      roles: [selectedRole], // Assign the default role
     });
   }
 
